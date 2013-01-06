@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.0"
+    xmlns="http://java.sun.com/xml/ns/persistence"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+	<persistence-unit name="MrCoffee" transaction-type="JTA">
+
+        <!-- Persistence Provider for this persistence unit -->
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+
+        <!-- Data Source -->
+        <jta-data-source>java:jboss/datasources/MrCoffeeDS</jta-data-source>
+
+        <!-- Entities for this persistence unit -->
+    	<class>org.mrcoffee.entities.Billing</class>
+		<class>org.mrcoffee.entities.Consumer</class>
+
+        <!-- Properties of this persistence unit -->
+        <properties>
+
+            <!-- Target server implementation -->
+            <property name="eclipselink.target-server" value="JBoss"/>
+
+            <!-- Default cache type -->
+            <property name="eclipselink.cache.type.default" value="HardWeak"/>
+
+            <!-- Cache size per entity class -->
+            <!--
+            <property name="eclipselink.cache.size.JPAStaffType" value= "50" />
+            -->
+
+            <!-- Logging - http://wiki.eclipse.org/EclipseLink/Examples/JPA/Logging -->
+            <!--  <property name="eclipselink.logging.logger" value="net.atos.roman.utils.logging.el.CommonsLoggingSessionLog"/> -->
+            <!--  <property name="eclipselink.logging.logger" value="net.atos.roman.server.logging.JBossLogger"/> -->
+            <property name="eclipselink.logging.logger" value="ServerLogger"/>
+            <!-- <property name="eclipselink.logging.level" value="FINE" /> -->
+            <property name="eclipselink.logging.level.sql" value="FINE"/>
+            <property name="eclipselink.logging.parameters" value="true"/>
+
+        </properties>
+
+	</persistence-unit>
+</persistence>
