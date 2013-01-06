@@ -1,0 +1,33 @@
+body {
+	font-family: Helvetica, Arial
+}
+
+input:not([type]), input[type=text], input[type=password], select {
+	background-color: #FDFDFD;
+	border: 1px solid gray;
+	padding: 2px;
+}
+
+.consumer th {
+	text-align: left;
+}
+
+.consumer input:not([type]), input[type=text] {
+	width: 40ex;
+}
+
+.consumer input[disabled] {
+	text-decoration: line-through;
+	border-color: Silver;
+	background-color: Silver;
+}
+
+.consumer h4 {
+	margin-bottom: 4px;
+}
+
+.consumer textarea {
+	width: 103ex;
+	height: 10em;
+}
+
