@@ -17,16 +17,25 @@
 		    </thead>
 		    <tbody data-bind="foreach: consumers">
 		        <tr>
-		            <td><input data-bind="value: forename" /></td>
-		            <td><input data-bind="value: surname" /></td>
+		            <td><input data-bind="value: forename, valueUpdate: 'afterkeydown'" required /></td>
+		            <td><input data-bind="value: surname, valueUpdate: 'afterkeydown'" required /></td>
 		            <td><a href="#" data-bind="click: $root.removeConsumer">Delete</a></td>
 		        </tr>      
 		    </tbody>
 		</table>
-		<button data-bind="click: addConsumer">Add new consumer</button>
+		<button data-bind="enable: hasNoEmptyItems, click: addConsumer">Add new consumer</button>
+		<button data-bind="enable: isValid, click: saveConsumers">Save</button>
 		        
 		<h4>Debug Window</h4>
-        <textarea name="consumers" data-bind="value: ko.toJSON(consumers)"></textarea>		        
+		<span>All customers</span><br/>
+        <textarea name="consumers" data-bind="value: ko.toJSON(consumers)"></textarea>
+        <br/>
+        <span>Dirty customers</span><br/>
+        <textarea name="consumers" data-bind="value: ko.toJSON(dirtyItems)"></textarea>
+        <br/>
+        <span>Modified customers</span><br/>
+        <textarea name="consumers" data-bind="value: ko.toJSON(modifiedItems)"></textarea>
+        <button data-bind="click: reloadModifiedConsumers">Reload</button>  
 		        
         <script type="text/javascript" src="js/libs/jquery-1.8.3.min.js"></script>
         <script type='text/javascript' src='js/libs/knockout-2.2.0.js'></script>        
