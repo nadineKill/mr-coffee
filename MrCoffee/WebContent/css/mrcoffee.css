@@ -15,6 +15,14 @@ input:required:invalid, input:focus:invalid {
     -moz-box-shadow: none;
 }
 
+input.isDirty {
+	background-color: #FFFFCC;
+}
+
+input.isNew  {
+    background-color: #CCFF99;
+}
+
 .consumer th {
 	text-align: left;
 	font-size: 14px
