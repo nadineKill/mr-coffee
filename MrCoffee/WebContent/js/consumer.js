@@ -3,7 +3,7 @@ function Consumer(data) {
     var self = this;
 
     // Not editable data
-    self.id = new ko.id(self, data.id);
+    self.id = ko.id(self, data.id);
 
     // Editable data
     self.forename = ko.observable(data.forename);
@@ -28,6 +28,9 @@ function ConsumersViewModel() {
     // Editable data
     self.consumers = ko.observableArray([]);
 
+    // Modification detection
+    self.state = new ko.objectStateArray(self.consumers);
+
     // Operations
     self.addConsumer = function() {
     	var newConsumer = new Consumer({id : "", forename : "", surname : "", isNew : true});
@@ -46,60 +49,10 @@ function ConsumersViewModel() {
     	//TODO
     };
 
-
-    // Modification detection
-
-    // Dirty items computation
-    self.dirtyItems = ko.computed(function() {
-    	self.lastDirtyItems = ko.utils.arrayFilter(self.consumers(), function(consumer) {
-            return consumer.state.dirtyFlag.isDirty();
-        });
-    	return self.lastDirtyItems;
-    }, self);
-
-    self.hasDirtyItems = ko.computed(function() {
-        return self.dirtyItems().length > 0;
-    }, self);
-
-    // Modified items computation
-    self.reloadModified = ko.observable(false);
-
-    self.modifiedItems = ko.computed(function() {
-    	//will be only computed if the related reload flag is set
-    	if (self.reloadModified()) {
-	    	self.lastModifiedItems = ko.utils.arrayFilter(self.consumers(), function(consumer) {
-	            return consumer.state.dirtyFlag.isDirty() && !consumer.state.newFlag.isNew();
-	        });
-	    	self.reloadModified(false);
-    	}
-    	return self.lastModifiedItems;
-    }, self);
-
-    self.hasDirtyItems = ko.computed(function() {
-        return self.dirtyItems().length > 0;
-    }, self);
-
-    self.reloadModifiedConsumers = function() {
-    	self.reloadModified(true);
-    };
-
-    // Empty items computation
-    self.emptyItems = ko.computed(function() {
-    	return ko.utils.arrayFilter(self.consumers(), function(consumer) {
-            return consumer.state.emptyFlag.isEmpty();
-        });
-    }, self);
-
-    self.hasNoEmptyItems = ko.computed(function() {
-        return !(self.emptyItems().length > 0);
-    }, self);
-
-
     //Validation operations
     self.isValid = ko.computed(function() {
-    	return self.hasDirtyItems() && self.hasNoEmptyItems();
-    }, self);
-
+    	return self.state.hasDirtyItems() && self.state.hasNoEmptyItems();
+    });
 
     // Load initial state from server,
     // convert it to Consumer instances,
