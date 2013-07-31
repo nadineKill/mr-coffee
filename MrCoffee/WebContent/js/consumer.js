@@ -1,23 +1,39 @@
 // Class to represent a row in the table
-function Consumer(data) {
+function Consumer() {
     var self = this;
 
-    // Not editable data
-    self.id = ko.id(self, data.id);
+    // Initialisation
+    var initialize = function(data) {
 
-    // Editable data
-    self.forename = ko.observable(data.forename);
-    self.surname = ko.observable(data.surname);
+	    // Not editable data
+	    self.id = ko.id(self, data.id);
 
-    // Modification detection
-    self.state = new ko.objectState({
-		target 				: self,
-		isInitiallyDirty 	: false,
-		isInitiallyNew 		: data.isNew,
-		checkEmptyFunction 	: function() {
-			return (self.forename().length == 0) || (self.surname().length == 0);
-		}
-    });
+	    // Editable data
+	    self.forename = ko.observable(data.forename);
+	    self.surname = ko.observable(data.surname);
+
+	    // Modification detection
+	    self.state = new ko.objectState({
+			target 				: self,
+			isInitiallyDirty 	: false,
+			isInitiallyNew 		: data.isNew,
+			checkEmptyFunction 	: function() {
+				return (self.forename().length == 0) || (self.surname().length == 0);
+			}
+	    });
+
+    };
+
+    // Creational functions
+    self.createDefault = function() {
+    	initialize({id : "", forename : "", surname : "", isNew : true});
+    	return self;
+    };
+
+    self.createFromJSON = function(data) {
+    	initialize(data);
+    	return self;
+    };
 
 }
 
@@ -33,12 +49,12 @@ function ConsumersViewModel() {
 
     // Operations
     self.addConsumer = function() {
-    	var newConsumer = new Consumer({id : "", forename : "", surname : "", isNew : true});
+    	var newConsumer = (new Consumer()).createDefault();
         self.consumers.push(newConsumer);
     };
 
     self.removeConsumer = function(consumer) {
-    	if (consumer.state.newFlag.isNew()) {
+    	if (consumer.state.isNew()) {
     		self.consumers.remove(consumer);
     	} else {
     		self.consumers.destroy(consumer);
@@ -46,24 +62,122 @@ function ConsumersViewModel() {
     };
 
     self.saveConsumers = function() {
-    	//TODO
+
+    	//send the newly created customers
+    	//self.state.created.reloadItems();
+    	var allData = self.state.created.items();
+
+		var mappedItems = JSON.stringify(
+			$.map(allData, function(data) {
+	        	return {"forename": data.forename,
+	        			"surname": data.surname};
+	    }));
+
+		var mergeData = function(receivedData) {
+
+	        var mergedConsumers = $.map(self.consumers(), function(consumer) {
+
+	        	var receivedConsumer = (new Consumer()).createDefault();
+
+	        	//check if we received data for a consumer
+	        	var match = ko.utils.arrayFirst(receivedData, function (data) {
+	        		receivedConsumer = data;
+	        		return consumer.forename() == receivedConsumer.forename &&
+	        		       consumer.surname() == receivedConsumer.surname;
+	        	});
+
+	        	//if a match was detected then merge the data
+	        	if (match) {
+	        		return new Consumer(receivedConsumer);
+	        	}
+
+	        	return consumer;
+
+	        });
+
+	        self.consumers(mergedConsumers);
+		};
+
+    	$.ajax({
+    		  type: 		"POST",
+    		  url: 			"rest/consumer",
+    		  contentType: 	"application/json",
+    		  data: 		mappedItems,
+    		  dataType: 	"json",
+    		  success: 		mergeData
+    	});
+
+    	//send the modified customers
+    	//self.state.modified.reloadItems();
+    	var allData = self.state.modified.items();
+
+		var mappedItems = JSON.stringify(
+			$.map(allData, function(data) {
+	        	return {"id": data.id,
+	        			"forename": data.forename,
+	        			"surname": data.surname};
+	    }));
+
+    	$.ajax({
+    		  type: 		"PUT",
+    		  url: 			"rest/consumer",
+    		  contentType: 	"application/json",
+    		  data: 		mappedItems,
+    		  dataType: 	"json",
+    		  success: 		mergeData
+    	});
+
+    	//send the deleted customers
+    	//self.state.deleted.reloadItems();
+    	var allData = self.state.deleted.items();
+
+    	var mappedItems = JSON.stringify(
+			$.map(allData, function(data) {
+	        	return {"id": data.id,
+	        			"forename": data.forename,
+	        			"surname": data.surname};
+	    }));
+
+    	var mergeData = function() {
+			  self.state.deleted.clearItems();
+		};
+
+    	$.ajax({
+  		  type: 		"DELETE",
+  		  url: 			"rest/consumer",
+  		  contentType: 	"application/json",
+  		  data: 		mappedItems,
+		  success: 		mergeData
+    	});
+
     };
 
     //Validation operations
-    self.isValid = ko.computed(function() {
-    	return self.state.hasDirtyItems() && self.state.hasNoEmptyItems();
+    self.enableAdd = ko.computed(function() {
+    	return self.state.empty.hasNoItems();
+    });
+
+    self.enableSave = ko.computed(function() {
+    	return (self.state.created.hasItems() && self.state.empty.hasNoItems()) ||
+    	 	   self.state.modified.hasItems() ||
+    		   self.state.deleted.hasItems();
     });
 
     // Load initial state from server,
     // convert it to Consumer instances,
     // then populate self.consumers
-    $.getJSON("rest/consumer", function(allData) {
+    $.ajax({
+    	type:		"GET",
+    	url:		"rest/consumer",
+    	dataType: 	"json",
+    	success:	function(allData) {
 
-        var mappedConsumers = $.map(allData, function(data) {
-        	return new Consumer(data);
-        });
+            var mappedConsumers = $.map(allData, function(data) {
+            	return (new Consumer()).createFromJSON(data);
+            });
 
-        self.consumers(mappedConsumers);
+            self.consumers(mappedConsumers);
+        }
     });
 
 }

@@ -27,10 +27,9 @@ public class Consumer implements Serializable {
 	public static final String PROPERTY_FORENAME = "forename";
 	public static final String PROPERTY_SURNAME = "surname";
 
-
 	@Id
-	@SequenceGenerator(name="CONSUMER_ID_GENERATOR", sequenceName="SEQ")
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CONSUMER_ID_GENERATOR")
+	@SequenceGenerator(name="CONSUMER_ID_GENERATOR", sequenceName="SEQ", allocationSize=1)
+	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="CONSUMER_ID_GENERATOR")
 	private long id;
 
 	private String forename;

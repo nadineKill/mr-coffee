@@ -1,5 +1,6 @@
 package org.mrcoffee.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,12 +30,16 @@ public class GenericDataService {
         return entity;
     }
 
-    public <T> T find(Class<T> entityClass, Object entityId) {
+    public <T> T findById(Class<T> entityClass,
+    					  Object entityId) {
+
        return entityManager.find(entityClass, entityId);
     }
 
     @TransactionAttribute(TransactionAttributeType.MANDATORY)
-    public <T> void delete(Class<T> entityClass, Object entityId) {
+    public <T> void deleteById(Class<T> entityClass,
+    						   Object entityId) {
+
        Object ref = entityManager.getReference(entityClass, entityId);
        entityManager.remove(ref);
     }
@@ -44,26 +49,34 @@ public class GenericDataService {
         return entityManager.merge(entity);
     }
 
-    public List<?> findWithNamedQuery(String namedQueryName){
+    public List<?> findWithNamedQuery(String namedQueryName) {
         return entityManager.createNamedQuery(namedQueryName).getResultList();
     }
 
-    public List<?> findWithNamedQuery(String namedQueryName, Map<String,Object> parameters){
+    public List<?> findWithNamedQuery(String namedQueryName,
+    								  Map<String,Object> parameters) {
+
         return findWithNamedQuery(namedQueryName, parameters, 0);
     }
 
-    public List<?> findWithNamedQuery(String queryName, int resultLimit) {
+    public List<?> findWithNamedQuery(String queryName,
+    								  int resultLimit) {
+
         return entityManager.createNamedQuery(queryName).
                 		setMaxResults(resultLimit).
                 		getResultList();
     }
 
     @SuppressWarnings("unchecked")
-	public <T> List<T> findByNativeQuery(String sql, Class<T> entityClass) {
+	public <T> List<T> findByNativeQuery(String sql,
+										 Class<T> entityClass) {
+
         return entityManager.createNativeQuery(sql, entityClass).getResultList();
     }
 
-    public List<?> findWithNamedQuery(String namedQueryName, Map<String,Object> parameters,int resultLimit){
+    public List<?> findWithNamedQuery(String namedQueryName,
+    								  Map<String,Object> parameters,
+    								  int resultLimit){
 
 	   Set<Entry<String, Object>> rawParameters = parameters.entrySet();
 	   Query query = entityManager.createNamedQuery(namedQueryName);
@@ -88,6 +101,36 @@ public class GenericDataService {
 	public <T> List<T> getEntities(Class<T> entityClass) {
 		String queryText = "SELECT o FROM " + entityClass.getSimpleName() + " o";
 		return findWithJpql(queryText);
+	}
+
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	public <T> List<T> createEntities(List<T> entities) {
+		List<T> createdEntityList = new ArrayList<>(entities.size());
+		for (T entity : entities) {
+			T createdEntity = create(entity);
+			createdEntityList.add(createdEntity);
+		}
+		return createdEntityList;
+	}
+
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	public <T> List<T> updateEntities(List<T> entities) {
+		List<T> updatedEntityList = new ArrayList<>(entities.size());
+		for (T entity : entities) {
+			T updatedEntity = update(entity);
+			updatedEntityList.add(updatedEntity);
+		}
+		return updatedEntityList;
+	}
+
+	@TransactionAttribute(TransactionAttributeType.MANDATORY)
+	public <T> void deleteEntities(Class<T> entityClass,
+								   List<T> entities,
+								   EntityIdVisitor<T> visitor) {
+
+		for (T entity : entities) {
+			deleteById(entityClass, visitor.getId(entity));
+		}
 	}
 
 }

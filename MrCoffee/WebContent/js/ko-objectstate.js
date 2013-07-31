@@ -29,7 +29,8 @@ ko.dirtyFlag = function(target, isInitiallyDirty) {
     var _isInitiallyDirty = ko.observable(isInitiallyDirty);
 
     result.isDirty = ko.computed(function() {
-        return _isInitiallyDirty() || _initialState() !== ko.toJSON(target);
+        return _isInitiallyDirty() ||						//is set on construction as dirty?
+        	   _initialState() !== ko.toJSON(target);		//is the current object different?
     });
 
     result.reset = function() {
@@ -108,21 +109,25 @@ ko.deleteFlag = function(target) {
 ko.objectState = function(data) {
 	var stateResult = function() {};
 
-	stateResult.dirtyFlag = new ko.dirtyFlag(data.target, data.isInitiallyDirty);
-	stateResult.emptyFlag = new ko.emptyFlag(data.checkEmptyFunction);
-	stateResult.newFlag = new ko.newFlag(data.target, data.isInitiallyNew);
-	stateResult.deleteFlag = new ko.deleteFlag(data.target);
+	var dirtyFlag = new ko.dirtyFlag(data.target, data.isInitiallyDirty);
+	var emptyFlag = new ko.emptyFlag(data.checkEmptyFunction);
+	var newFlag = new ko.newFlag(data.target, data.isInitiallyNew);
+	var deleteFlag = new ko.deleteFlag(data.target);
 
 	stateResult.isDirty = function() {
-		return stateResult.dirtyFlag.isDirty() && !stateResult.newFlag.isNew();
+		return dirtyFlag.isDirty() && !newFlag.isNew();
+	};
+
+	stateResult.isEmpty = function() {
+		return emptyFlag.isEmpty();
 	};
 
 	stateResult.isDeleted = function() {
-		return stateResult.deleteFlag.isDeleted();
+		return deleteFlag.isDeleted();
 	};
 
 	stateResult.isNew = function() {
-		return stateResult.newFlag.isNew();
+		return newFlag.isNew();
 	};
 
 	return stateResult;
@@ -143,55 +148,49 @@ ko.objectStateArray = function(target) {
 	};
 
     // Empty items computation
-    stateResult.emptyItems = ko.computed(function() {
-    	return ko.utils.arrayFilter(target(), function(item) {
-            return item.state.emptyFlag.isEmpty();
-        });
-    });
-
-    stateResult.hasNoEmptyItems = ko.computed(function() {
-        return !(stateResult.emptyItems().length > 0);
-    });
-
-    // Dirty items computation
-	stateResult.lastDirtyItems = [];
-
-	stateResult.dirtyItems = ko.computed(function() {
-		stateResult.lastDirtyItems = ko.utils.arrayFilter(target(), function(item) {
-            return item.state.dirtyFlag.isDirty();
-        });
-    	return stateResult.lastDirtyItems;
+	stateResult.empty = new ko.reloadableFilteredItems({
+    	items			: target,
+    	reload			: "auto",
+    	filterFunction	: function(item) {
+    		return item.state.isEmpty();
+    	}
 	});
 
-	stateResult.dirtyItemsAsJSON = function() {
-		return ko.toJSON(stateResult.dirtyItems);
-	};
-
-	stateResult.hasDirtyItems = ko.computed(function() {
-        return stateResult.dirtyItems().length > 0;
-    });
+    // Dirty items computation
+	stateResult.dirty = new ko.reloadableFilteredItems({
+    	items			: target,
+    	reload			: "auto",
+    	filterFunction	: function(item) {
+    		return item.state.isDirty();
+    	}
+	});
 
     // Created items computation
     stateResult.created = new ko.reloadableFilteredItems({
     	items			: target,
+    	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.newFlag.isNew();
+    		return item.state.isNew();
     	}
     });
 
     // Modified items computation
     stateResult.modified = new ko.reloadableFilteredItems({
     	items			: target,
+    	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.dirtyFlag.isDirty() && !item.state.newFlag.isNew();
+    		return item.state.isDirty() &&
+    			   !item.state.isNew() &&
+    			   !item.state.isDeleted();
     	}
     });
 
     //Deleted items computation
     stateResult.deleted = new ko.reloadableFilteredItems({
     	items			: target,
+    	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.deleteFlag.isDeleted();
+    		return item.state.isDeleted();
     	}
     });
 
@@ -209,32 +208,57 @@ ko.objectStateArray = function(target) {
 ko.reloadableFilteredItems = function(data) {
 	var itemsResult = function() {};
 
-	itemsResult.filteredItems = [];
-	itemsResult.doReload = ko.observable(false);
+	var filterItems = function(item) {
+    	return data.filterFunction(item);
+    };
+
+    var reloadAutomatically = false;
+	if (data.reload != undefined &&
+		data.reload != "") {
+
+		if (data.reload == "manual") {
+			reloadAutomatically = false;
+		} else if (data.reload == "auto") {
+			reloadAutomatically = true;
+		}
+	}
+
+	var filteredItems = [];
+	var doReload = ko.observable(false);
 
 	itemsResult.items = ko.computed(function() {
     	//will be only computed if the related reload flag is set
-    	if (itemsResult.doReload()) {
-    		itemsResult.filteredItems = ko.toJS(
-    			ko.utils.arrayFilter(data.items(), function(item) {
-    				return data.filterFunction(item);
-    			})
+    	if (doReload() || reloadAutomatically) {
+    		filteredItems = ko.toJS(
+    			ko.utils.arrayFilter(data.items(), filterItems)
     		);
-    		itemsResult.doReload(false);
+    		doReload(false);
     	}
-    	return itemsResult.filteredItems;
+    	return filteredItems;
     });
 
 	itemsResult.itemsAsJSON = function() {
 		return ko.toJSON(itemsResult.items);
 	};
 
-	itemsResult.hasItems = ko.computed(function() {
+	var hasItems = function() {
         return itemsResult.items().length > 0;
+    };
+
+	itemsResult.hasItems = ko.computed(function() {
+        return hasItems();
+    });
+
+	itemsResult.hasNoItems = ko.computed(function() {
+        return !hasItems();
     });
 
 	itemsResult.reloadItems = function() {
-		itemsResult.doReload(true);
+		doReload(true);
+    };
+
+    itemsResult.clearItems = function() {
+    	data.items.remove(filterItems);
     };
 
 	return itemsResult;
