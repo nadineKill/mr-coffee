@@ -14,6 +14,7 @@ import javax.persistence.Query;
 
 import org.mrcoffee.annotations.DefaultDatabase;
 
+
 @Stateless
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class GenericDataService {
