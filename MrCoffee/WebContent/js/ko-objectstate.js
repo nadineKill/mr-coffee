@@ -152,7 +152,11 @@ ko.objectStateArray = function(target) {
     	items			: target,
     	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.isEmpty();
+    		if (item.state === undefined) {
+    			return false;
+    		} else {
+    			return item.state.isEmpty();
+    		}
     	}
 	});
 
@@ -161,7 +165,11 @@ ko.objectStateArray = function(target) {
     	items			: target,
     	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.isDirty();
+    		if (item.state === undefined) {
+    			return false;
+    		} else {
+    			return item.state.isDirty();
+    		}
     	}
 	});
 
@@ -170,7 +178,11 @@ ko.objectStateArray = function(target) {
     	items			: target,
     	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.isNew();
+    		if (item.state === undefined) {
+    			return false;
+    		} else {
+    			return item.state.isNew();
+    		}
     	}
     });
 
@@ -179,9 +191,13 @@ ko.objectStateArray = function(target) {
     	items			: target,
     	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.isDirty() &&
-    			   !item.state.isNew() &&
-    			   !item.state.isDeleted();
+    		if (item.state === undefined) {
+    			return false;
+    		} else {
+	    		return item.state.isDirty() &&
+	    			   !item.state.isNew() &&
+	    			   !item.state.isDeleted();
+    		}
     	}
     });
 
@@ -190,7 +206,11 @@ ko.objectStateArray = function(target) {
     	items			: target,
     	reload			: "auto",
     	filterFunction	: function(item) {
-    		return item.state.isDeleted();
+    		if (item.state === undefined) {
+    			return false;
+    		} else {
+    			return item.state.isDeleted();
+    		}
     	}
     });
 

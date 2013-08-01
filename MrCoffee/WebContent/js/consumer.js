@@ -88,7 +88,7 @@ function ConsumersViewModel() {
 
 	        	//if a match was detected then merge the data
 	        	if (match) {
-	        		return new Consumer(receivedConsumer);
+	        		return (new Consumer()).createFromJSON(receivedConsumer);
 	        	}
 
 	        	return consumer;
@@ -143,11 +143,11 @@ function ConsumersViewModel() {
 		};
 
     	$.ajax({
-  		  type: 		"DELETE",
-  		  url: 			"rest/consumer",
-  		  contentType: 	"application/json",
-  		  data: 		mappedItems,
-		  success: 		mergeData
+  		  	type: 			"DELETE",
+  		  	url: 			"rest/consumer",
+  		  	contentType: 	"application/json",
+  		  	data: 			mappedItems,
+  		  	success: 		mergeData
     	});
 
     };
