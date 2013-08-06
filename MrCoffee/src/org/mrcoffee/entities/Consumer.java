@@ -17,6 +17,7 @@ import java.util.List;
  *
  */
 @Entity
+@Table(name="CONSUMER")
 @XmlRootElement(name=Consumer.TYPE_NAME)
 public class Consumer implements Serializable {
 
@@ -26,15 +27,21 @@ public class Consumer implements Serializable {
 	public static final String PROPERTY_ID = "id";
 	public static final String PROPERTY_FORENAME = "forename";
 	public static final String PROPERTY_SURNAME = "surname";
+	public static final String PROPERTY_CREDIT = "credit";
 
 	@Id
 	@SequenceGenerator(name="CONSUMER_ID_GENERATOR", sequenceName="SEQ", allocationSize=1)
 	@GeneratedValue(strategy=GenerationType.IDENTITY, generator="CONSUMER_ID_GENERATOR")
 	private long id;
 
+	@Column(name="FORENAME")
 	private String forename;
 
+	@Column(name="SURNAME")
 	private String surname;
+
+	@Column(name="CREDIT")
+	private Integer credit;
 
 	//bi-directional many-to-one association to Billing
 	@OneToMany(mappedBy="consumer")
@@ -73,6 +80,16 @@ public class Consumer implements Serializable {
 
 	public void setSurname(String surename) {
 		this.surname = surename;
+	}
+
+	@XmlAttribute(name=PROPERTY_CREDIT)
+	@JsonProperty(PROPERTY_CREDIT)
+	public Integer getCredit() {
+		return this.credit;
+	}
+
+	public void setCredit(Integer credit) {
+		this.credit = credit;
 	}
 
 	public List<Billing> getBillings() {

@@ -7,9 +7,10 @@ import java.math.BigDecimal;
 
 /**
  * The persistent class for the BILLING database table.
- * 
+ *
  */
 @Entity
+@Table(name="BILLING")
 public class Billing implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -23,7 +24,7 @@ public class Billing implements Serializable {
 	@Column(name="DELTA_TO_PAY")
 	private BigDecimal deltaToPay;
 
-	@Column(name="\"MONTH\"")
+	@Column(name="MONTH")
 	private BigDecimal month;
 
 	@Column(name="NR_PADS_WEEK_1")

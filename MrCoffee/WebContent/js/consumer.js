@@ -1,4 +1,4 @@
-// Class to represent a row in the table
+//Class to represent a row in the table
 function Consumer() {
     var self = this;
 
@@ -7,10 +7,10 @@ function Consumer() {
 
 	    // Not editable data
 	    self.id = ko.id(self, data.id);
-
 	    // Editable data
 	    self.forename = ko.observable(data.forename);
 	    self.surname = ko.observable(data.surname);
+	    self.credit = ko.observable(data.credit);
 
 	    // Modification detection
 	    self.state = new ko.objectState({
@@ -22,11 +22,15 @@ function Consumer() {
 			}
 	    });
 
+	    self.fullname = ko.computed(function() {
+	    	return self.forename() + " " + self.surname();
+	    });
+
     };
 
     // Creational functions
     self.createDefault = function() {
-    	initialize({id : "", forename : "", surname : "", isNew : true});
+    	initialize({id : "", forename : "", surname : "", credit : 0, isNew : true});
     	return self;
     };
 
@@ -70,7 +74,8 @@ function ConsumersViewModel() {
 		var mappedItems = JSON.stringify(
 			$.map(allData, function(data) {
 	        	return {"forename": data.forename,
-	        			"surname": data.surname};
+	        			"surname": data.surname,
+	        			"credit": data.credit};
 	    }));
 
 		var mergeData = function(receivedData) {
@@ -115,7 +120,8 @@ function ConsumersViewModel() {
 			$.map(allData, function(data) {
 	        	return {"id": data.id,
 	        			"forename": data.forename,
-	        			"surname": data.surname};
+	        			"surname": data.surname,
+	        			"credit": data.credit};
 	    }));
 
     	$.ajax({
@@ -135,7 +141,8 @@ function ConsumersViewModel() {
 			$.map(allData, function(data) {
 	        	return {"id": data.id,
 	        			"forename": data.forename,
-	        			"surname": data.surname};
+	        			"surname": data.surname,
+	        			"credit": data.credit};
 	    }));
 
     	var mergeData = function() {
