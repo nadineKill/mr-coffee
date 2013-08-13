@@ -6,6 +6,8 @@ body {
     }
 button {
   font-weight: bold;
+  padding: 5px 5px 5px 5px;
+  margin-left:8px;
   font-family: Helvetica;
   font-style: normal;
   font-size: 14px;
@@ -201,7 +203,7 @@ div.highlight {
   border: 2px solid gray;
   border-radius:10px;
   padding: 20px;
-  width:200px;
+  width:600px;
 
 }
 div.backg {
