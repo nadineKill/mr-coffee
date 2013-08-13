@@ -1,7 +1,8 @@
-
 body {
     font-family: Helvetica, Arial;
     padding-left: 10px;
+    margin-left:8px;
+    position:relative;
     }
 button {
   font-weight: bold;
@@ -50,7 +51,7 @@ button:active {
 }
 #menu-bar {
   width: 95%;
-  margin: 0px 0px 2px 0px;
+  margin: 20px 50px 20px 0px;
   padding: 5px 2px 5px 5px;
   height: 33px;
   line-height: 100%;
@@ -192,10 +193,24 @@ input:not([type]), input[type=text], input[type=password], select {
   background-color: #FDFDFD;
   border: 2px solid gray;
   border-radius:10px;
-  padding: 2px;
+  padding: 5px;
+  margin-left: 5px;
+}
+div.highlight {
+  background-color: #CCCCCC;
+  border: 2px solid gray;
+  border-radius:10px;
+  padding: 20px;
+  width:200px;
 
 }
-
+div.backg {
+    width: 100%;
+    height: 700px;
+    background-image:url('../images/backg.png');
+    background-repeat:no-repeat;
+    background-position:800px 370px;
+}
 h2 {
 text-shadow: 5px 5px 5px #CCCCCC;
 }
@@ -239,3 +254,4 @@ input.isNew  {
   width: 103ex;
   height: 5em;
 }
+

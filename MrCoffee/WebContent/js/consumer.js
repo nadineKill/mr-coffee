@@ -188,6 +188,5 @@ function ConsumersViewModel() {
     });
 
 }
-
 //Initialize the binding
 ko.applyBindings(new ConsumersViewModel());

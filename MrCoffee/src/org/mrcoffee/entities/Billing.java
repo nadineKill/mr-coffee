@@ -19,30 +19,14 @@ public class Billing implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="BILLING_ID_GENERATOR")
 	private long id;
 
-	private BigDecimal credit;
-
-	@Column(name="DELTA_TO_PAY")
-	private BigDecimal deltaToPay;
+	@Column(name="YEAR")
+	private Integer year;
 
 	@Column(name="MONTH")
-	private BigDecimal month;
+	private Integer month;
 
-	@Column(name="NR_PADS_WEEK_1")
-	private BigDecimal nrPadsWeek1;
-
-	@Column(name="NR_PADS_WEEK_2")
-	private BigDecimal nrPadsWeek2;
-
-	@Column(name="NR_PADS_WEEK_3")
-	private BigDecimal nrPadsWeek3;
-
-	@Column(name="NR_PADS_WEEK_4")
-	private BigDecimal nrPadsWeek4;
-
-	@Column(name="NR_PADS_WEEK_5")
-	private BigDecimal nrPadsWeek5;
-
-	private BigDecimal paid;
+	@Column(name="NR_OF_PADS")
+	private Integer nrOfPads;
 
 	@Column(name="SUM_TO_PAY")
 	private BigDecimal sumToPay;
@@ -61,77 +45,28 @@ public class Billing implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-
-	public BigDecimal getCredit() {
-		return this.credit;
+	public Integer getYear() {
+		return this.year;
 	}
 
-	public void setCredit(BigDecimal credit) {
-		this.credit = credit;
+	public void setYear(Integer year) {
+		this.year = year;
 	}
 
-	public BigDecimal getDeltaToPay() {
-		return this.deltaToPay;
-	}
-
-	public void setDeltaToPay(BigDecimal deltaToPay) {
-		this.deltaToPay = deltaToPay;
-	}
-
-	public BigDecimal getMonth() {
+	public Integer getMonth() {
 		return this.month;
 	}
 
-	public void setMonth(BigDecimal month) {
+	public void setMonth(Integer month) {
 		this.month = month;
 	}
 
-	public BigDecimal getNrPadsWeek1() {
-		return this.nrPadsWeek1;
+	public Integer getnrOfPads() {
+		return this.nrOfPads;
 	}
 
-	public void setNrPadsWeek1(BigDecimal nrPadsWeek1) {
-		this.nrPadsWeek1 = nrPadsWeek1;
-	}
-
-	public BigDecimal getNrPadsWeek2() {
-		return this.nrPadsWeek2;
-	}
-
-	public void setNrPadsWeek2(BigDecimal nrPadsWeek2) {
-		this.nrPadsWeek2 = nrPadsWeek2;
-	}
-
-	public BigDecimal getNrPadsWeek3() {
-		return this.nrPadsWeek3;
-	}
-
-	public void setNrPadsWeek3(BigDecimal nrPadsWeek3) {
-		this.nrPadsWeek3 = nrPadsWeek3;
-	}
-
-	public BigDecimal getNrPadsWeek4() {
-		return this.nrPadsWeek4;
-	}
-
-	public void setNrPadsWeek4(BigDecimal nrPadsWeek4) {
-		this.nrPadsWeek4 = nrPadsWeek4;
-	}
-
-	public BigDecimal getNrPadsWeek5() {
-		return this.nrPadsWeek5;
-	}
-
-	public void setNrPadsWeek5(BigDecimal nrPadsWeek5) {
-		this.nrPadsWeek5 = nrPadsWeek5;
-	}
-
-	public BigDecimal getPaid() {
-		return this.paid;
-	}
-
-	public void setPaid(BigDecimal paid) {
-		this.paid = paid;
+	public void setnrOfPads(Integer nrOfPads) {
+		this.nrOfPads = nrOfPads;
 	}
 
 	public BigDecimal getSumToPay() {
